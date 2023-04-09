@@ -77,10 +77,12 @@ func (s *Swtpm) Socket() (string, error) {
 		fmt.Sprintf("XDG_CONFIG_HOME=%s", s.Tpmstate),
 	)
 	err := s.c.Start()
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Millisecond * 100)
 	return s.ServerSocket, err
 }
 
 func (s *Swtpm) Stop() {
+	time.Sleep(time.Millisecond * 100)
 	s.c.Process.Signal(syscall.SIGTERM)
+	s.c.Process.Wait()
 }
