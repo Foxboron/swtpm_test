@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"syscall"
 	"time"
 )
 
@@ -58,7 +59,6 @@ func (s *Swtpm) Setup() error {
 func (s *Swtpm) Socket() (string, error) {
 	permall := path.Join(s.Tpmstate, "tpm2-00.permall")
 	if _, err := os.Stat(permall); os.IsNotExist(err) {
-		fmt.Println("doesn't exist")
 		if err := s.Setup(); err != nil {
 			return "", fmt.Errorf("failed swtmp setup: %w", err)
 		}
@@ -82,5 +82,5 @@ func (s *Swtpm) Socket() (string, error) {
 }
 
 func (s *Swtpm) Stop() {
-	s.c.Process.Kill()
+	s.c.Process.Signal(syscall.SIGTERM)
 }
