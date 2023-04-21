@@ -70,7 +70,7 @@ func (s *Swtpm) Socket() (string, error) {
 		"--server", fmt.Sprintf("type=unixio,path=%s", s.ServerSocket),
 		"--ctrl", fmt.Sprintf("type=unixio,path=%s", s.ControlSocket),
 		"--flags", "not-need-init,startup-clear",
-		"--log", "file=logs,level=20",
+		// "--log", "file=logs,level=20",
 	}
 	s.c = exec.Command("swtpm", args...)
 	s.c.Env = append(os.Environ(),
