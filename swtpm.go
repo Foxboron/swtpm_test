@@ -10,7 +10,7 @@ import (
 )
 
 func CreateUserConfigFiles(dir string) error {
-	cmd := exec.Command("/usr/share/swtpm/swtpm-create-user-config-files")
+	cmd := exec.Command("swtpm_setup", "--create-config-files")
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("XDG_CONFIG_HOME=%s", dir),
 	)
