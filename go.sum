@@ -1,0 +1,4 @@
+github.com/google/go-tpm v0.9.1-0.20230629100720-f17b0354fbfc h1:5ERVUw2INcGD/BHQ3cFdTtKznOGZXkFMlRylzOVRVKM=
+github.com/google/go-tpm v0.9.1-0.20230629100720-f17b0354fbfc/go.mod h1:FkNVkc6C+IsvDI9Jw1OveJmxGZUUaKxtrpOS47QWKfU=
+golang.org/x/sys v0.8.0 h1:EBmGv8NaZBZTWvrbjNoL6HVt+IVy3QDQpJs7VRIw3tU=
+golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

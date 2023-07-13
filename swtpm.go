@@ -1,4 +1,4 @@
-package swtpm_test
+package swtpm
 
 import (
 	"fmt"
