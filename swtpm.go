@@ -7,6 +7,8 @@ import (
 	"path"
 	"syscall"
 	"time"
+
+	"github.com/google/go-tpm/tpm2/transport"
 )
 
 func CreateUserConfigFiles(dir string) error {
@@ -25,17 +27,13 @@ type Swtpm struct {
 	LockNVRam     bool
 	ServerSocket  string
 	ControlSocket string
+	tpm           transport.TPMCloser
 }
 
-func NewSwtpm(dir string) *Swtpm {
-	return &Swtpm{
-		Tpmstate:      dir,
-		Flags:         []string{"not-need-init", "startup-clear"},
-		LockNVRam:     true,
-		SetupFlags:    []string{"--create-ek-cert", "--create-platform-cert", "--lock-nvram"},
-		ServerSocket:  path.Join(dir, "swtp-sock"),
-		ControlSocket: path.Join(dir, "swtp-sock.ctrl"),
-	}
+var _ transport.TPMCloser = &Swtpm{}
+
+func (s *Swtpm) Send(input []byte) ([]byte, error) {
+	return s.tpm.Send(input)
 }
 
 func (s *Swtpm) Setup() error {
@@ -81,8 +79,41 @@ func (s *Swtpm) Socket() (string, error) {
 	return s.ServerSocket, err
 }
 
-func (s *Swtpm) Stop() {
+func (s *Swtpm) Close() error {
 	time.Sleep(time.Millisecond * 100)
 	s.c.Process.Signal(syscall.SIGTERM)
 	s.c.Process.Wait()
+	if s.tpm != nil {
+		return s.tpm.Close()
+	}
+	return nil
+}
+
+func NewSwtpm(dir string) *Swtpm {
+	// Old API
+	return &Swtpm{
+		Tpmstate:      dir,
+		Flags:         []string{"not-need-init", "startup-clear"},
+		LockNVRam:     true,
+		SetupFlags:    []string{"--create-ek-cert", "--create-platform-cert", "--lock-nvram"},
+		ServerSocket:  path.Join(dir, "swtp-sock"),
+		ControlSocket: path.Join(dir, "swtp-sock.ctrl"),
+	}
+}
+
+func OpenSwtpm(dir string) (transport.TPMCloser, error) {
+	// TPM Transport option
+	swtpm := NewSwtpm(dir)
+
+	s, err := swtpm.Socket()
+	if err != nil {
+		return nil, err
+	}
+
+	tpm, err := transport.OpenTPM(s)
+	if err != nil {
+		return nil, err
+	}
+	swtpm.tpm = tpm
+	return swtpm, nil
 }
